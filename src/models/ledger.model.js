@@ -1,4 +1,5 @@
-const mongoose=require("mongoose")
+const mongoose=require("mongoose");
+
 
 const ledgerSchema=new mongoose.Schema({
     account:{
@@ -29,7 +30,7 @@ const ledgerSchema=new mongoose.Schema({
         required:[true,"Ledger type is required..!!"],
         immutable:true
     }
-})
+},{timestamps:true})
 function preventLedgerModification(){
     throw new Error("Ledger entries are immutable and cannot be modified and  deleted..!!")
 }
