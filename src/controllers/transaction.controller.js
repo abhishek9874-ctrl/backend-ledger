@@ -239,7 +239,33 @@ async function createInitialFundsTransaction(req, res) {
 
 }
 
+async function getRecentTransactionController(req, res) {
+    const accounts = await accountModel.find({
+        user: req.user._id
+    });
+
+    const accountIds = accounts.map(account => account._id);
+
+    const transactions = await transactionModel.find({
+        $or: [
+            { fromAccount: { $in: accountIds } },
+            { toAccount: { $in: accountIds } }
+        ]
+    })
+        .sort({ createdAt: -1 })
+        .limit(3);
+
+    res.status(200).json({
+        transactions
+    });
+}
+
+
+
+
+
 module.exports = {
     createTransaction,
-    createInitialFundsTransaction
+    createInitialFundsTransaction,
+    getRecentTransactionController
 }
