@@ -20,6 +20,7 @@ app.use(
 const authRouter=require("./routes/auth.routes")
 const accountRouter=require("./routes/account.routes")
 const transactionRoutes=require("./routes/transaction.routes")
+const ledgerRoutes = require("./routes/ledger.routes");
 
 
 app.get("/",(req,res)=>{
@@ -31,5 +32,6 @@ app.get("/",(req,res)=>{
 app.use("/api/auth",authRouter)
 app.use("/api/account",accountRouter)
 app.use("/api/transactions",transactionRoutes)
+app.use("/api/ledger", ledgerRoutes);
 
 module.exports=app;
