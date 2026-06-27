@@ -6,7 +6,7 @@ const accountSchema=new mongoose.Schema({
     user:{
         type:mongoose.Schema.Types.ObjectId,
         ref:"user",
-        required:[true,"Account must ne associated with user...!!!"],
+        required:[true,"Account must be associated with user...!!!"],
         index:true
     },
     status:{

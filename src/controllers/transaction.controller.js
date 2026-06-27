@@ -260,6 +260,43 @@ async function getRecentTransactionController(req, res) {
     });
 }
 
+async function getAllTransactions(req, res) {
+    const accounts = await accountModel.find({
+        user: req.user._id
+    })
+
+    const accountIds = accounts.map(account => account._id);
+
+    const transactions = await transactionModel.find({
+        $or: [
+            { fromAccount: { $in: accountIds } },
+            { toAccount: { $in: accountIds } }
+        ]
+    })
+        .populate({
+            path: "fromAccount",
+            select: "accountNumber user",
+            populate: {
+                path: "user",
+                select: "name"
+            }
+        })
+        .populate({
+            path: "toAccount",
+            select: "accountNumber user",
+            populate: {
+                path: "user",
+                select: "name"
+            }
+        })
+        .sort({ createdAt: -1 });
+
+    res.status(200).json({
+        transactions
+    });
+}
+
+
 
 
 
@@ -267,5 +304,6 @@ async function getRecentTransactionController(req, res) {
 module.exports = {
     createTransaction,
     createInitialFundsTransaction,
-    getRecentTransactionController
+    getRecentTransactionController,
+    getAllTransactions
 }
