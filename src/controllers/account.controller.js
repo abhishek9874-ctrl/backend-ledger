@@ -52,9 +52,28 @@ async function getAccountBalanceController(req,res) {
 }
 
 
+async function getAllAccountsController(req,res) {
+    try {
+        const accounts=await accountModel.find({
+            user:{$ne:req.user._id},
+            status:"ACTIVE"
+        })
+        .populate("user","name");
+
+        res.status(200).json({
+            accounts
+        });
+    } catch (err) {
+        res.status(500).json({
+            message:err.message
+        })
+    }
+}
+
 
 module.exports={
     createAccountController,
     getUserAccountsController,
-    getAccountBalanceController
+    getAccountBalanceController,
+    getAllAccountsController
 }

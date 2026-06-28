@@ -11,6 +11,11 @@ router.get("/",authMiddleware.authMiddleware,accountController.getUserAccountsCo
  * api/account/balance/:accountId
  */
 router.get("/balance/:accountId",authMiddleware.authMiddleware,accountController.getAccountBalanceController)
+router.get(
+    "/all",
+    authMiddleware.authMiddleware,
+    accountController.getAllAccountsController
+);
 
 
 module.exports=router
