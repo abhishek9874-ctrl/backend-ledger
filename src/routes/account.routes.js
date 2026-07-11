@@ -16,6 +16,7 @@ router.get(
     authMiddleware.authMiddleware,
     accountController.getAllAccountsController
 );
+router.get("/profile",authMiddleware.authMiddleware,accountController.getProfileController)
 
 
 module.exports=router
