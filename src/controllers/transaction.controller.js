@@ -252,11 +252,27 @@ async function getRecentTransactionController(req, res) {
             { toAccount: { $in: accountIds } }
         ]
     })
+    .populate({
+        path:"fromAccount",
+        select:"accountNumber user",
+        populate:{
+            path:"user",
+            select:"name"
+        }
+    })
+    .populate({
+        path:"toAccount",
+        select:"accountNumber user",
+        populate:{
+            path:"user",
+            select:"name"
+        }
+    })
         .sort({ createdAt: -1 })
         .limit(3);
 
     res.status(200).json({
-        transactions
+        transactions,
     });
 }
 
