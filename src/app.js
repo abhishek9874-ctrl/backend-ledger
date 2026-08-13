@@ -21,6 +21,7 @@ const authRouter=require("./routes/auth.routes")
 const accountRouter=require("./routes/account.routes")
 const transactionRoutes=require("./routes/transaction.routes")
 const ledgerRoutes = require("./routes/ledger.routes");
+const healthRoutes=require("./routes/health.routes")
 
 
 app.get("/",(req,res)=>{
@@ -33,5 +34,6 @@ app.use("/api/auth",authRouter)
 app.use("/api/account",accountRouter)
 app.use("/api/transactions",transactionRoutes)
 app.use("/api/ledger", ledgerRoutes);
+app.use("/api/health",healthRoutes)
 
 module.exports=app;
