@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken")
 const emailService = require("../services/email.service");
 const tokenBlackListModel = require("../models/blackList.model");
 const bcrypt = require("bcrypt");
+const crypto = require("crypto");
 
 
 async function userRegisterController(req, res) {
@@ -184,6 +185,110 @@ const changePasswordController = async (req, res) => {
         });
     }
 };
+const forgotPasswordController = async (req, res) => {
+    try {
+
+        const { email } = req.body;
+
+        const user = await userModel
+            .findOne({ email })
+            .select("+resetPasswordToken +resetPasswordExpires");
+
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found"
+            });
+        }
+
+        // Generate reset token
+        const resetToken = crypto.randomBytes(32).toString("hex");
+
+        // Save token and expiry
+        user.resetPasswordToken = resetToken;
+
+        user.resetPasswordExpires =
+            Date.now() + 15 * 60 * 1000;
+
+        await user.save();
+
+        // Create password reset URL
+        const resetUrl =
+            `http://localhost:5173/reset-password/${resetToken}`;
+
+        // Send reset email
+        await emailService.sendPasswordResetEmail(
+            user.email,
+            user.name,
+            resetUrl
+        );
+
+        res.status(200).json({
+            message: "Password reset link sent successfully"
+        });
+
+    } catch (err) {
+
+        console.error("Forgot password error:", err);
+
+        res.status(500).json({
+            message: err.message
+        });
+
+    }
+};
+const resetPasswordController = async (req, res) => {
+    try {
+
+        const { token } = req.params;
+        const { password } = req.body;
+
+        if (!password) {
+            return res.status(400).json({
+                message: "Password is required"
+            });
+        }
+
+        if (password.length < 6) {
+            return res.status(400).json({
+                message: "Password must be at least 6 characters"
+            });
+        }
+
+        const user = await userModel
+            .findOne({
+                resetPasswordToken: token,
+                resetPasswordExpires: {
+                    $gt: Date.now()
+                }
+            })
+            .select("+password +resetPasswordToken +resetPasswordExpires");
+
+        if (!user) {
+            return res.status(400).json({
+                message: "Invalid or expired reset token"
+            });
+        }
+
+        user.password = password;
+
+        user.resetPasswordToken = null;
+        user.resetPasswordExpires = null;
+
+        await user.save();
+
+        res.status(200).json({
+            message: "Password reset successfully"
+        });
+
+    } catch (err) {
+
+        console.error("Reset password error:", err);
+
+        res.status(500).json({
+            message: err.message
+        });
+    }
+};
 
 
-module.exports = { userRegisterController, userLoginController, authLogoutController, updateProfileController, changePasswordController }
+module.exports = { userRegisterController, userLoginController, authLogoutController, updateProfileController, changePasswordController,forgotPasswordController ,resetPasswordController}

@@ -13,4 +13,6 @@ router.post("/login",authController.userLoginController)
 router.post("/logout",authController.authLogoutController)
 router.put("/profile",authMiddleware.authMiddleware,authController.updateProfileController)
 router.put("/changedPassword",authMiddleware.authMiddleware,authController.changePasswordController)
+router.post("/forgotPassword",authController.forgotPasswordController)
+router.post("/reset-password/:token",authController.resetPasswordController)
 module.exports=router
