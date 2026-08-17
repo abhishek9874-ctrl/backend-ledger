@@ -211,11 +211,11 @@ const forgotPasswordController = async (req, res) => {
 
         await user.save();
 
-        // Create password reset URL
+        
         const resetUrl =
             `http://localhost:5173/reset-password/${resetToken}`;
 
-        // Send reset email
+        
         await emailService.sendPasswordResetEmail(
             user.email,
             user.name,
@@ -228,7 +228,6 @@ const forgotPasswordController = async (req, res) => {
 
     } catch (err) {
 
-        console.error("Forgot password error:", err);
 
         res.status(500).json({
             message: err.message
@@ -282,7 +281,6 @@ const resetPasswordController = async (req, res) => {
 
     } catch (err) {
 
-        console.error("Reset password error:", err);
 
         res.status(500).json({
             message: err.message

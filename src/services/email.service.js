@@ -69,7 +69,7 @@ async function sendPasswordResetEmail(userEmail, name, resetUrl) {
 
   const subject = "Reset Your Backend Ledger Password";
 
-  const text = `Hello ${name},
+  const text = `Hello ${name}
 
 We received a request to reset your Backend Ledger password.
 

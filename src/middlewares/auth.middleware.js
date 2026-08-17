@@ -72,7 +72,6 @@ async function authSystemUserMiddleware(req,res,next) {
         req.user=user
             return next()
     } catch (err) {
-        console.log(err)
         return res.status(401).json({
             message:"Unauthorized access,not a valid token..!!!"
         })

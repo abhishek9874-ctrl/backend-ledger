@@ -29,13 +29,13 @@ async function getUserAccountsController(req,res) {
 async function getAccountBalanceController(req,res) {
     const { accountId }=req.params
 
-    console.log(accountId)
+    
 
     const account=await accountModel.findOne({
         _id:accountId,
         user:req.user._id
     })
-    console.log(account)
+    
 
     if(!account){
         return res.status(404).json({
