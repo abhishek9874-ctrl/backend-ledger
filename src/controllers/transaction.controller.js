@@ -104,13 +104,14 @@ async function createTransaction(req, res) {
     }
 
     let transaction;
+    let session;
     try {
 
 
         /**
          * 5. Create transaction (PENDING)
          */
-        const session = await mongoose.startSession()
+        session = await mongoose.startSession()
         session.startTransaction()
 
         transaction = (await transactionModel.create([{
@@ -149,21 +150,37 @@ async function createTransaction(req, res) {
         await session.commitTransaction()
         session.endSession()
     } catch (error) {
+        if (session) {
+            await session.abortTransaction();
+        }
 
         return res.status(400).json({
             message: "Transaction is Pending due to some issue, please retry after sometime",
         })
 
     }
+    finally {
+        if (session) {
+            await session.endSession();
+        }
+    }
     /**
      * 10. Send email notification
      */
-    await emailService.sendTransactionEmail(req.user.email, req.user.name, amount, toAccount)
+    try {
+        await emailService.sendTransactionEmail(
+            req.user.email,
+            req.user.name,
+            amount,
+            toAccount
+        );
+    } catch (error) {
+    }
 
     return res.status(201).json({
         message: "Transaction completed successfully",
         transaction: transaction
-    })
+    });
 
 }
 
@@ -175,9 +192,6 @@ async function createInitialFundsTransaction(req, res) {
             message: "toAccount, amount and idempotencyKey are required"
         })
     }
-    console.log("ACCOUNT MODEL:", accountModel);
-    console.log("TYPE:", typeof accountModel);
-    console.log("FINDONE:", accountModel.findOne);
 
     const toUserAccount = await accountModel.findOne({
         _id: toAccount,
@@ -252,22 +266,22 @@ async function getRecentTransactionController(req, res) {
             { toAccount: { $in: accountIds } }
         ]
     })
-    .populate({
-        path:"fromAccount",
-        select:"accountNumber user",
-        populate:{
-            path:"user",
-            select:"name"
-        }
-    })
-    .populate({
-        path:"toAccount",
-        select:"accountNumber user",
-        populate:{
-            path:"user",
-            select:"name"
-        }
-    })
+        .populate({
+            path: "fromAccount",
+            select: "accountNumber user",
+            populate: {
+                path: "user",
+                select: "name"
+            }
+        })
+        .populate({
+            path: "toAccount",
+            select: "accountNumber user",
+            populate: {
+                path: "user",
+                select: "name"
+            }
+        })
         .sort({ createdAt: -1 })
         .limit(3);
 
