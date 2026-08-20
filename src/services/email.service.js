@@ -13,6 +13,14 @@ const transporter = nodemailer.createTransport({
 });
 
 // Verify the connection configuration
+transporter.verify((error, success) => {
+    if (error) {
+        console.error("❌ Nodemailer configuration error:");
+        console.error(error);
+    } else {
+        console.log("✅ Nodemailer is ready to send emails");
+    }
+});
 
 // Function to send email
 const sendEmail = async (to, subject, text, html) => {
@@ -25,10 +33,15 @@ const sendEmail = async (to, subject, text, html) => {
             html,
         });
 
+        console.log("✅ Email sent successfully:", info.messageId);
+
         return info;
 
     } catch (error) {
-        return null;
+        console.error("❌ Email sending failed:");
+        console.error(error);
+
+        throw error;
     }
 };
 
