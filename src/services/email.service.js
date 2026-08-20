@@ -43,14 +43,14 @@ async function sendRegistrationEmail(userEmail, name) {
 
 async function sendTransactionEmail(userEmail, name, amount, toAccount) {
   const subject = "Transaction Successfull..!!!";
-  const text = `Hello ${name},\n\nYour transaction of $${amount} to account ${toAccount} was successfull..!!!.\n\nBest Regards,\nThe Backend Ladger Team`;
+  const text = `Hello ${name},\n\nYour transaction of ₹${amount} to account ${toAccount} was successfull..!!!.\n\nBest Regards,\nThe Backend Ladger Team`;
   const html = `<p>Hello ${name}, </p><p> Your transaction of amount $${amount} to account ${toAccount} was successfull.</p><p>Best regards,<br> The Backend Ledger team.</p>`
   await sendEmail(userEmail, subject, text, html);
 }
 
 async function sendTransactionFailureEmail(userEmail, name, amount, toAccount) {
   const subject = "Transaction Failed..!!!";
-  const text = `Hello ${name},\n\nYour transaction of $${amount} to account ${toAccount} was Failed..!!!.\n\nBest Regards,\nThe Backend Ladger Team`;
+  const text = `Hello ${name},\n\nYour transaction of ₹${amount} to account ${toAccount} was Failed..!!!.\n\nBest Regards,\nThe Backend Ladger Team`;
   const html = `<p>Hello ${name}, </p><p> Your transaction of amount ${amount} to account ${toAccount} was Failed.</p><p>Best regards,<br> The Backend Ledger team.</p>`
   await sendEmail(userEmail, subject, text, html);
 }
