@@ -1,51 +1,32 @@
 require('dotenv').config();
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 
-const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 587,
-  secure: false,
-  requireTLS: true,
-  family: 4,
+const resend = new Resend(process.env.RESEND_API_KEY);
 
-  auth: {
-    type: 'OAuth2',
-    user: process.env.EMAIL_USER,
-    clientId: process.env.CLIENT_ID,
-    clientSecret: process.env.CLIENT_SECRET,
-    refreshToken: process.env.REFRESH_TOKEN,
-  },
-});
 
-// Verify the connection configuration
-transporter.verify((error, success) => {
-    if (error) {
-        console.error("❌ Nodemailer configuration error:");
-        console.error(error);
-    } else {
-        console.log("✅ Nodemailer is ready to send emails");
-    }
-});
 
 // Function to send email
 const sendEmail = async (to, subject, text, html) => {
     try {
-        const info = await transporter.sendMail({
-            from: `"Backend Ledger" <${process.env.EMAIL_USER}>`,
-            to,
+        const { data, error } = await resend.emails.send({
+            from: 'Backend Ledger <onboarding@resend.dev>',
+            to: [to],
             subject,
             text,
             html,
         });
 
-        console.log("✅ Email sent successfully:", info.messageId);
+        if (error) {
+            console.error("❌ Resend email error:", error);
+            throw error;
+        }
 
-        return info;
+        console.log("✅ Email sent successfully:", data);
+
+        return data;
 
     } catch (error) {
-        console.error("❌ Email sending failed:");
-        console.error(error);
-
+        console.error("❌ Email sending failed:", error);
         throw error;
     }
 };
