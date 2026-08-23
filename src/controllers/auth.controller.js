@@ -4,6 +4,88 @@ const emailService = require("../services/email.service");
 const tokenBlackListModel = require("../models/blackList.model");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
+const { OAuth2Client } = require("google-auth-library");
+const googleClient = new OAuth2Client(
+    process.env.GOOGLE_CLIENT_ID
+);
+
+
+async function googleLoginController(req, res) {
+    try {
+        const { credential } = req.body;
+
+        if (!credential) {
+            return res.status(400).json({
+                message: "Google credential is required"
+            });
+        }
+
+        const ticket = await googleClient.verifyIdToken({
+            idToken: credential,
+            audience: process.env.GOOGLE_CLIENT_ID
+        });
+
+        const payload = ticket.getPayload();
+
+        const {
+            sub: googleId,
+            email,
+            name,
+            email_verified
+        } = payload;
+
+        if (!email || !email_verified) {
+            return res.status(401).json({
+                message: "Google account email could not be verified"
+            });
+        }
+
+        let user = await userModel.findOne({ email });
+
+        if (!user) {
+            user = await userModel.create({
+                email,
+                name,
+                googleId
+            });
+        }
+
+        const token = jwt.sign(
+            {
+                userId: user._id
+            },
+            process.env.JWT_SECRET,
+            {
+                expiresIn: "3d"
+            }
+        );
+
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: process.env.NODE_ENV === "production"
+                ? "none"
+                : "lax",
+        });
+
+        return res.status(200).json({
+            message: "Google Login Successfully...!!!",
+            user: {
+                _id: user._id,
+                email: user.email,
+                name: user.name
+            },
+            token
+        });
+
+    } catch (error) {
+        console.error("Google login error:", error);
+
+        return res.status(401).json({
+            message: "Google authentication failed"
+        });
+    }
+}
 
 
 async function userRegisterController(req, res) {
@@ -208,10 +290,8 @@ const forgotPasswordController = async (req, res) => {
             });
         }
 
-        // Generate reset token
         const resetToken = crypto.randomBytes(32).toString("hex");
 
-        // Save token and expiry
         user.resetPasswordToken = resetToken;
 
         user.resetPasswordExpires =
@@ -297,4 +377,4 @@ const resetPasswordController = async (req, res) => {
 };
 
 
-module.exports = { userRegisterController, userLoginController, authLogoutController, updateProfileController, changePasswordController, forgotPasswordController, resetPasswordController }
+module.exports = { userRegisterController, userLoginController, authLogoutController, updateProfileController, changePasswordController, forgotPasswordController, resetPasswordController,googleLoginController }

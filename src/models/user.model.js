@@ -17,10 +17,16 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: [true, "Password should be required to create an account...!!"],
+    required: false,
     minlength: [6, "Password should contain more than 6 characters..!!"],
     select: false
-  },
+},
+  googleId: {
+    type: String,
+    unique: true,
+    sparse: true,
+    default: null
+},
   systemUser: {
     type: Boolean,
     default: false,
