@@ -12,7 +12,8 @@ const googleClient = new OAuth2Client(
 
 async function googleLoginController(req, res) {
     try {
-        const { credential } = req.body;
+        const { credential, action } = req.body;
+
 
         if (!credential) {
             return res.status(400).json({
@@ -42,12 +43,34 @@ async function googleLoginController(req, res) {
 
         let user = await userModel.findOne({ email });
 
-        if (!user) {
+        if (action === "register") {
+
+            if (user) {
+                return res.status(409).json({
+                    message: "An account with this email already exists. Please login instead."
+                });
+            }
+
             user = await userModel.create({
                 email,
                 name,
                 googleId
             });
+
+        } else {
+
+            if (!user) {
+                return res.status(404).json({
+                    message: "No account found with this Google account. Please register first."
+                });
+            }
+
+            if (user.googleId && user.googleId !== googleId) {
+                return res.status(401).json({
+                    message: "This email is linked to a different Google account."
+                });
+            }
+
         }
 
         const token = jwt.sign(
@@ -377,4 +400,4 @@ const resetPasswordController = async (req, res) => {
 };
 
 
-module.exports = { userRegisterController, userLoginController, authLogoutController, updateProfileController, changePasswordController, forgotPasswordController, resetPasswordController,googleLoginController }
+module.exports = { userRegisterController, userLoginController, authLogoutController, updateProfileController, changePasswordController, forgotPasswordController, resetPasswordController, googleLoginController }
