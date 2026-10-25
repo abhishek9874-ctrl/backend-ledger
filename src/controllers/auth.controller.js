@@ -90,6 +90,7 @@ async function googleLoginController(req, res) {
                 ? "none"
                 : "lax",
         });
+        console.log("Google login systemUser:", user.systemUser);
 
         return res.status(200).json({
             message: "Google Login Successfully...!!!",
