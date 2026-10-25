@@ -41,7 +41,7 @@ async function googleLoginController(req, res) {
             });
         }
 
-        let user = await userModel.findOne({ email });
+        let user = await userModel.findOne({ email }).select("+systemUser");
 
         if (action === "register") {
 
@@ -156,7 +156,7 @@ async function userLoginController(req, res) {
 
     const user = await userModel.findOne({
         email
-    }).select("+password")
+    }).select("+password +systemUser")
 
     if (!user) {
         return res.status(401).json({
