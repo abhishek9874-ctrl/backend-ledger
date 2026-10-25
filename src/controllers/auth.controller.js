@@ -96,7 +96,8 @@ async function googleLoginController(req, res) {
             user: {
                 _id: user._id,
                 email: user.email,
-                name: user.name
+                name: user.name,
+                systemUser:user.systemUser
             },
             token
         });
@@ -142,7 +143,8 @@ async function userRegisterController(req, res) {
         user: {
             _id: user._id,
             email: user.email,
-            name: user.name
+            name: user.name,
+            systemUser:user.systemUser
         },
         token
     })
@@ -186,7 +188,8 @@ async function userLoginController(req, res) {
         user: {
             _id: user._id,
             email: user.email,
-            name: user.name
+            name: user.name,
+            systemUser:user.systemUser,
         },
         token
     })
