@@ -77,7 +77,7 @@ async function getProfileController(req, res) {
             .findOne({
                 user: req.user._id
             })
-            .populate("user", "name email");
+            .populate("user", "name email +systemUser");
 
         if (!account) {
             return res.status(404).json({
