@@ -9,7 +9,8 @@ const app=express();
 app.use(express.json())
 app.use(cookieParser())
 const allowedOrigins = [
-  "http://localhost:5173",
+   "http://localhost:5173",
+  "http://localhost:5174",
   "https://ledger-frontend-vkj0.onrender.com",
 ];
 
