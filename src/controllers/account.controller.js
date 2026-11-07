@@ -58,7 +58,7 @@ async function getAllAccountsController(req,res) {
             user:{$ne:req.user._id},
             status:"ACTIVE"
         })
-        .populate("user","name");
+        .populate("user","name email +systemUser");
 
         res.status(200).json({
             accounts
